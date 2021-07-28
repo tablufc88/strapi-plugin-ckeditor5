@@ -46,10 +46,19 @@ const Wysiwyg = ({
     if (data && data.mime.includes('image')) {
       const url = prefixFileUrlWithBackendUrl(data.url);
       editor.model.change(writer => {
-        const imageElement = writer.createElement('image', {
-          src: url
-        });
-        editor.model.insertContent(imageElement, editor.model.document.selection);
+        // const imageElement = writer.createElement('image', {
+        //   src: url
+        // });
+        // editor.model.insertContent(imageElement, editor.model.document.selection);
+
+        /**
+         * Above method wasn't working so used another one
+         * @see https://stackoverflow.com/questions/61752334/ckeditor5-insertcontent-function-not-working
+         */
+        const htmlDP = editor.data.processor;
+        const viewFragment = htmlDP.toView(`<img src="${url}" alt="${data.alternativeText}" caption="${data.caption}" />`);
+        const modelFragment = editor.data.toModel( viewFragment );
+        editor.model.insertContent(modelFragment, editor.model.document.selection);
       });
       // Handle videos and other type of files by adding some code
     }
